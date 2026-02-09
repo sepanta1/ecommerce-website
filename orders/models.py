@@ -36,22 +36,13 @@ class Order(TimeStampedModel, UUIDModel):
     )
 
     # Addresses - denormalized for historical record
-    # (Even if user changes their address, order keeps original)
     shipping_address = models.ForeignKey(
         Address,
         on_delete=models.PROTECT,
         related_name='shipping_orders'
     )
-    billing_address = models.ForeignKey(
-        Address,
-        on_delete=models.PROTECT,
-        related_name='billing_orders'
-    )
 
     # Pricing
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
-    tax = models.DecimalField(max_digits=10, decimal_places=2)
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -62,13 +53,12 @@ class Order(TimeStampedModel, UUIDModel):
 
     # Notes
     customer_notes = models.TextField(blank=True)
-    admin_notes = models.TextField(blank=True)
+
 
     class Meta:
         db_table = 'orders'
         ordering = ['-created']
         indexes = [
-            models.Index(fields=['order_number']),
             models.Index(fields=['customer', '-created']),
             models.Index(fields=['status']),
         ]

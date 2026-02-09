@@ -2,7 +2,6 @@
 
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 from core.models import TimeStampedModel, UUIDModel, SoftDeleteModel
 
@@ -40,9 +39,6 @@ class Brand(TimeStampedModel, UUIDModel):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
-    logo = models.ImageField(upload_to='brands/', null=True, blank=True)
-    website = models.URLField(blank=True)
-
     class Meta:
         db_table = 'brands'
         ordering = ['name']
@@ -58,9 +54,14 @@ class Product(TimeStampedModel, UUIDModel, SoftDeleteModel):
     """
     name = models.CharField(max_length=200, db_index=True)
     slug = models.SlugField(max_length=200, unique=True, db_index=True)
-    #Stock Keeping Unit
-    sku = models.CharField(max_length=50, unique=True, db_index=True)
     description = models.TextField()
+    sku = models.CharField(
+        max_length=50,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="SKU for simple products without variants"
+    )
     brand = models.ForeignKey(
         Brand,
         on_delete=models.PROTECT,
@@ -104,15 +105,14 @@ class Product(TimeStampedModel, UUIDModel, SoftDeleteModel):
         db_table = 'products'
         ordering = ['-created']
         indexes = [
-            models.Index(fields=['slug']),
-            models.Index(fields=['sku']),
-            models.Index(fields=['-created']),
+            models.Index(fields=["slug"]),
+            models.Index(fields=["sku"]),
+            models.Index(fields=["-created"]),
         ]
 
     def __str__(self):
         return self.name
 
-    
     @property
     def profit_margin(self):
         """
@@ -148,7 +148,13 @@ class ProductImage(TimeStampedModel, UUIDModel):
     class Meta:
         db_table = 'product_images'
         ordering = ['display_order', 'created']
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product'],
+                condition=models.Q(is_primary=True),
+                name='unique_primary_image_per_product'
+            )
+        ]
     def __str__(self):
         return f"{self.product.name} - Image {self.display_order}"
 

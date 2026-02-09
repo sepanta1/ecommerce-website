@@ -2,7 +2,6 @@
 
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.utils.translation import gettext_lazy as _
 from core.models import TimeStampedModel, UUIDModel
 from products.models import Product, ProductVariant
 from django.conf import settings
