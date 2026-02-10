@@ -27,25 +27,14 @@
             Sale
           </div>
           <!-- Product image-->
-          {% if product.primary_images %}
-          <img
-            src="{{ product.primary_images.0.image.url }}"
-            alt="{{ product.primary_images.0.alt_text }}"
-            class="card-img-top product-image"
-          />
-          {% elif product.images.all %}
-          <img
-            src="{{ product.images.first.image.url }}"
-            alt="{{ product.images.first.alt_text }}"
-            class="card-img-top product-image"
-          />
-          {% else %}
-          <img
-            src="{{product.productimages.image}}"
-            alt="تصویر موجود نیست"
-            class="card-img-top product-image"
-          />
-          {% endif %}
+          {% for image in product.images.all %}
+            {% if image.is_primary %}
+                <img src="{{ image.image.url }}"
+                  alt="{{ image.alt_text }}
+                class="card-img-top product-image">
+            {% endif %}
+          {% endfor %}
+
           <!-- Product details-->
           <div class="card-body p-4">
             <div class="text-center">
@@ -62,17 +51,28 @@
                 <div class="bi-star-fill"></div>
               </div>
               <!-- Product price-->
-              <span class="text-muted text-decoration-line-through"
+              <span 
                 >${{product.price}}</span
               >
             </div>
           </div>
           <!-- Product actions-->
-          <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-            <div class="text-center">
-              <a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a>
-            </div>
-          </div>
+          <div class="d-flex justify-content-center gap-2">
+  <a
+    class="btn btn-outline-dark"
+    href="{% url 'products:product_detail' product.slug %}"
+  >
+    View
+  </a>
+
+  <a
+    class="btn btn-dark"
+    href="#"
+  >
+    Add to Cart
+  </a>
+</div>
+
         </div>
       </div>
       {% endfor %}

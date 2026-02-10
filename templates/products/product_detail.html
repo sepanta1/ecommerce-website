@@ -1,0 +1,102 @@
+{% extends 'index.html'%}
+{%load static%}
+{% block content %}
+
+<div class="container py-5">
+  <div class="row g-5">
+
+    <!-- LEFT: Image gallery -->
+    <div class="col-md-6">
+
+      {% if product.images.all %}
+      <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+          {% for image in product.images.all %}
+            <button
+              type="button"
+              data-bs-target="#productCarousel"
+              data-bs-slide-to="{{ forloop.counter0 }}"
+              class="{% if image.is_primary or forloop.first %}active{% endif %}">
+            </button>
+          {% endfor %}
+        </div>
+
+        <!-- Images -->
+        <div class="carousel-inner">
+          {% for image in product.images.all %}
+            <div class="carousel-item {% if image.is_primary or forloop.first %}active{% endif %}">
+              <img
+                src="{{ image.image.url }}"
+                class="d-block w-100 img-fluid rounded"
+                alt="{{ image.alt_text|default:product.name }}"
+              >
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button"
+                data-bs-target="#productCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button"
+                data-bs-target="#productCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+
+      </div>
+      {% else %}
+        <img src="{% static 'images/no-image.png' %}"
+             class="img-fluid rounded"
+             alt="No image available">
+      {% endif %}
+    </div>
+
+    <!-- RIGHT: Product info -->
+    <div class="col-md-6">
+
+      <h1 class="display-6 fw-bold">{{ product.name }}</h1>
+
+      {% if product.brand %}
+        <p class="text-muted mb-2">{{ product.brand.name }}</p>
+      {% endif %}
+
+      <h3 class="text-success mb-4">
+        ${{ product.price }}
+      </h3>
+
+      {% if product.description %}
+        <p class="mb-4">{{ product.description }}</p>
+      {% endif %}
+
+      <!-- Actions -->
+      <form method="post" class="d-flex gap-3">
+        {% csrf_token %}
+        <input type="number"
+               name="quantity"
+               value="1"
+               min="1"
+               class="form-control w-25">
+
+        <button type="submit" class="btn btn-dark btn-lg">
+          Add to Cart
+        </button>
+      </form>
+
+      <!-- Meta -->
+      <ul class="list-unstyled mt-4">
+        {% if product.sku %}
+          <li><strong>SKU:</strong> {{ product.sku }}</li>
+        {% endif %}
+        {% if product.category %}
+          <li><strong>Category:</strong> {{ product.category.name }}</li>
+        {% endif %}
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
