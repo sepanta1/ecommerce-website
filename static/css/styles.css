@@ -79,6 +79,8 @@
   --bs-highlight-bg: #fff3cd;
 }
 
+
+
 *,
 *::before,
 *::after {
@@ -10825,3 +10827,74 @@ textarea.form-control-lg {
   }
 }
 
+/* === PERFECT SYMMETRICAL PRODUCT CARDS === */
+.symmetrical-card {
+  /* Equal height across all cards */
+  transition: all 0.2s ease;
+  
+  /* Hover effect */
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12) !important;
+  }
+}
+
+.card-img-wrapper {
+  /* Fixed aspect ratio for images */
+  aspect-ratio: 1 / 1; /* Square images */
+  overflow: hidden;
+  height: 200px; /* Fixed height */
+}
+
+.card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Perfect cropping */
+  object-position: center;
+}
+
+.card-body {
+  /* Equal content height */
+  min-height: 140px;
+}
+
+/* Title truncation (1 line) */
+.card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Description truncation (2 lines) */
+.card-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Price & Button perfect alignment */
+.card-body .d-flex.justify-content-between {
+  margin-top: auto; /* Push to bottom */
+}
+/* === UNIFORM PRODUCT CARD IMAGES === */
+.card-img-container {
+  height: 220px;           /* FIXED HEIGHT - All images same size */
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem 0.5rem 0 0;  /* Top rounded corners */
+  background: #f8f9fa;     /* Fallback background */
+}
+
+.card-img-container img {
+  width: 100%;
+  height: 100%;            /* Fill container completely */
+  object-fit: cover;       /* Crop to fill perfectly */
+  object-position: center; /* Center crop */
+  transition: transform 0.3s ease;
+}
+
+.symmetrical-card:hover .card-img-container img {
+  transform: scale(1.05);  /* Zoom on hover */
+}

@@ -1,0 +1,145 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %}
+  <div class="container py-5">
+    <h2 class="mb-4">Your Cart</h2>
+    {% if cart.items.exists %}
+      <form method="post" action="{% url 'cart:update' %}" id="cart-update-form">
+        {% csrf_token %}
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Variant</th>
+                <th>Price</th>
+                <th style="width:140px;">Qty</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart.items.all %}
+                <tr>
+                  <td>{{ item.product.name }}</td>
+                  <td>{{ item.variant.name|default:"-" }}</td>
+                  <td>
+                    {% if item.variant %}
+                      {{ item.variant.final_price }}
+                    {% else %}
+                      {{ item.product.price }}
+                    {% endif %}
+                  </td>
+                  <td>
+                    <input type="number"
+                           name="quantities[{{ item.id }}]"
+                           min="1"
+                           value="{{ item.quantity }}"
+                           class="form-control form-control-sm text-center">
+                  </td>
+                  <td>{{ item.subtotal }}</td>
+                  <td>
+                    <form method="post"
+                          action="{% url 'cart:remove' %}"
+                          class="d-inline cart-remove-form"
+                          data-remove-form>
+                      {% csrf_token %}
+                      <input type="hidden" name="item_id" value="{{ item.id }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <!-- ✅ TOTAL + ACTIONS -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <div>
+            <strong>Total:</strong>
+            <span class="fs-5 ms-2">{{ cart.total_price }}</span>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" id="update-cart-btn">Update Cart</button>
+            <form method="post" action="{% url 'cart:clear' %}" id="clear-cart-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger">Clear Cart</button>
+            </form>
+            <a href="#" class="btn btn-dark">Proceed to Checkout</a>
+          </div>
+        </div>
+      </form>
+    {% else %}
+      <div class="alert alert-info">Your cart is empty.</div>
+    {% endif %}
+  </div>
+  <!-- ===================== JS ===================== -->
+  <script>
+/* ---------- CSRF ---------- */
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    for (const raw of document.cookie.split(";")) {
+      const cookie = raw.trim();
+      if (cookie.startsWith(name + "=")) {
+        cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const csrftoken = getCookie("csrftoken");
+
+/* ---------- POST HELPER ---------- */
+async function postForm(url, formData {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": csrftoken,
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    credentials: "same-origin",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    alert("Something went wrong.");
+    throw new Error("Request failed");
+  }
+}
+
+/* ✅ UPDATE CART (ONE BUTTON) */
+const updateForm = document.getElementById("cart-update-form");
+updateForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const btn = document.getElementById("update-cart-btn");
+  btn.disabled = true;
+
+  try {
+    await postForm(updateForm.action, new FormData(updateForm));
+    window.location.reload();
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+/* ✅ REMOVE ITEM */
+document.querySelectorAll("[data-remove-form]").forEach((form) => {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await postForm(form.action, new FormData(form));
+    window.location.reload();
+  });
+});
+
+/* ✅ CLEAR CART */
+const clearCartForm = document.getElementById("clear-cart-form");
+clearCartForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await postForm(clearCartForm.action, new FormData(clearCartForm));
+  window.location.reload();
+});
+  </script>
+{% endblock %}
