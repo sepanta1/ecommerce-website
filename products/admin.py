@@ -3,6 +3,11 @@ from django.contrib import admin
 from .models import Brand, Category, Product, ProductImage, ProductVariant
 
 
+@admin.action(description="Mark selected Products as available")
+def make_available(modeladmin, request, queryset):
+    queryset.update(is_available=True)
+
+
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
     search_fields = ["name"]
@@ -41,6 +46,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [ProductImageInline]
     empty_value_display = "-empty-"
+    actions = [make_available]
 
 
 @admin.register(ProductVariant)

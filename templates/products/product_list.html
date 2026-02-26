@@ -1,4 +1,4 @@
-{% extends 'index.html' %}
+{% extends "index.html" %}
 {% load static %}
 {% block content %}
   <!-- Header-->
@@ -26,21 +26,17 @@
                 {% if image.is_primary %}
                   <img src="{{ image.image.url }}"
                        alt="{{ image.alt_text }}"
-                       height="280"
+                       height="300"
+                       width="450"
                        class="card-img-top product-image"
                        loading="lazy">
                 {% endif %}
               {% endfor %}
-              <!-- Product details-->
               <div class="card-body p-4">
                 <div class="text-center">
-                  <!-- Product name-->
                   <h5 class="fw-bolder">{{ product.name }}</h5>
-                  <!-- Product reviews-->
-                  <!-- Product price-->
                   <span>${{ product.price }}</span>
                 </div>
-                <!-- Product actions-->
                 <br>
                 <div class="d-flex justify-content-center gap-2">
                   <a class="btn btn-outline-dark"
